@@ -1,44 +1,57 @@
 <template>
   <div class="app-container">
-    <el-form ref="form" :model="form" label-width="150px">
-      <el-form-item label="网址">
-        <el-input v-model="form.name" placeholder="www.google.com" style="width:800px">
+    <el-form ref="form" :model="form" label-width="150px" style="width:1200px">
+      <el-form-item>
+        <el-input v-model="form.domain" placeholder="www.google.com">
           <el-select slot="prepend" v-model="form.protocol" placeholder="http://" style="width:100px">
-            <el-option label="http://" value="1" />
-            <el-option label="https://" value="2" />
+            <el-option label="http://" value="http://" />
+            <el-option label="https://" value="https://" />
           </el-select>
           <el-select slot="append" v-model="form.method" placeholder="GET" style="width:100px">
             <el-option label="GET" value="GET" />
             <el-option label="POST" value="POST" />
           </el-select>
-          <el-select slot="append" v-model="form.encode" placeholder="UTF-8" style="width:100px; margin-left:30px">
+          <el-select slot="append" v-model="form.encode" placeholder="UTF-8" style="width:100px; margin-left:20px">
             <el-option label="UTF-8" value="UTF-8" />
             <el-option label="GBK" value="GBK" />
           </el-select>
         </el-input>
       </el-form-item>
       <el-form-item>
-        <el-switch v-model="form.args" inactive-text="参数设置" />
-        <el-switch v-model="form.header" inactive-text="Header" style="margin-left:10px" />
-        <el-switch v-model="form.cookie" inactive-text="Cookie设置" style="margin-left:10px" />
-        <el-switch v-model="form.proxy" inactive-text="代理设置" style="margin-left:10px" />
+        <el-switch v-model="hasArg" inactive-text="参数设置" class="switch" />
+        <el-switch v-model="hasHeader" inactive-text="Header" class="switch" />
+        <el-switch v-model="hasCookie" inactive-text="Cookie设置" class="switch" @change="dynamicCookie()" />
+        <el-switch v-model="hasProxy" inactive-text="代理设置" class="switch" @change="dynamicProxy()" />
       </el-form-item>
-      <el-form-item label="Activity type">
-        <el-checkbox-group v-model="form.type">
-          <el-checkbox label="Online activities" name="type" />
-          <el-checkbox label="Promotion activities" name="type" />
-          <el-checkbox label="Offline activities" name="type" />
-          <el-checkbox label="Simple brand exposure" name="type" />
-        </el-checkbox-group>
+      <el-form-item
+        v-for="(cookie,index) in form.cookies"
+        :key="cookie.key"
+        :prop="'cookies.' + index + '.cookie'"
+      >
+        <el-tabs @tab-click="handleClick">
+          <el-tab-pane label="Cookie设置">
+            <el-input v-model="cookie.value" type="textarea" :autosize="{ minRows: 4 }" />
+          </el-tab-pane>
+        </el-tabs>
       </el-form-item>
-      <el-form-item label="Resources">
-        <el-radio-group v-model="form.resource">
-          <el-radio label="Sponsor" />
-          <el-radio label="Venue" />
-        </el-radio-group>
+      <el-form-item
+        v-for="(proxy,index) in form.proxys"
+        :key="proxy.key"
+        :prop="'proxys.' + index + '.proxy'"
+      >
+        <el-tabs @tab-click="handleClick">
+          <el-tab-pane label="代理设置">
+            <el-input v-model="proxy.ip" placeholder="请输入代理" style="width:200px" />
+            <el-input v-model="proxy.port" style="width:100px; margin-left:20px" />
+          </el-tab-pane>
+        </el-tabs>
       </el-form-item>
-      <el-form-item label="Activity form">
-        <el-input v-model="form.desc" type="textarea" />
+      <el-form-item>
+        <el-tabs v-model="headerTab" @tab-click="handleClick">
+          <el-tab-pane label="Header 请求头/返回头">
+            <el-input v-model="form.header" type="textarea" :autosize="{ minRows: 4 }" />
+          </el-tab-pane>
+        </el-tabs>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">Create</el-button>
@@ -52,25 +65,47 @@
 export default {
   data() {
     return {
+      hasCookie: false,
+      hasProxy: false,
+      hasHeader: false,
+      hasArg: false,
+      headerTabe: 'first',
       form: {
-        protocol: '',
-        name: '',
-        method: '',
-        encode: '',
-        args: false,
-        header: false,
-        cookie: false,
-        proxy: false,
-
-        type: [],
-        resource: '',
-        desc: ''
+        protocol: 'http://',
+        domain: '',
+        method: 'GET',
+        encode: 'UTF-8',
+        header: '',
+        args: [],
+        cookies: [],
+        proxys: []
       }
     }
   },
   methods: {
+    dynamicCookie() {
+      if (this.hasCookie === true) {
+        this.form.cookies.push({
+          value: ''
+        })
+      } else {
+        this.form.cookies.splice(0, 1)
+      }
+    },
+    dynamicProxy() {
+      if (this.hasProxy === true) {
+        this.form.proxys.push({
+          ip: '',
+          port: '0'
+        })
+      } else {
+        this.form.proxys.splice(0, 1)
+      }
+    },
     onSubmit() {
       this.$message('submit!')
+      this.domain = '11341241'
+      console.log(this.form)
     },
     onCancel() {
       this.$message({
@@ -85,5 +120,8 @@ export default {
 <style scoped>
 .line{
   text-align: center;
+}
+.switch{
+  margin-left: 30px;
 }
 </style>
