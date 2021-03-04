@@ -18,38 +18,52 @@
         </el-input>
       </el-form-item>
       <el-form-item>
-        <el-switch v-model="hasArg" inactive-text="参数设置" class="switch" />
         <el-switch v-model="hasHeader" inactive-text="Header" class="switch" />
-        <el-switch v-model="hasCookie" inactive-text="Cookie设置" class="switch" @change="dynamicCookie()" />
-        <el-switch v-model="hasProxy" inactive-text="代理设置" class="switch" @change="dynamicProxy()" />
+        <el-switch v-model="hasArg" inactive-text="参数设置" class="switch" />
+        <el-switch v-model="hasCookie" inactive-text="Cookie设置" class="switch" />
+        <el-switch v-model="hasProxy" inactive-text="代理设置" class="switch" />
       </el-form-item>
-      <el-form-item
-        v-for="(cookie,index) in form.cookies"
-        :key="cookie.key"
-        :prop="'cookies.' + index + '.cookie'"
-      >
-        <el-tabs @tab-click="handleClick">
+      <el-form-item v-show="hasHeader==1">
+        <el-tabs v-model="headerTab">
+          <el-tab-pane label="Header">
+            <el-input v-model="form.header.key" style="width:200px" :disabled="true" />
+            <el-select v-model="form.header.value" style="width:500px; margin-left:20px">
+              <el-option label="text/html" value="text/html" />
+              <el-option label="application/x-www-form-urlencoded;charset=utf-8" value="application/x-www-form-urlencoded;charset=utf-8" />
+              <el-option label="application/json;charset=utf-8" value="application/json;charset=utf-8" />
+            </el-select>
+            <el-button type="primary" style="margin-left:20px" @click="addHeader()">增加一项</el-button>
+            <el-form-item
+              v-for="(item, index) in form.header.optional"
+              :key="index"
+              :prop="'optional.' + index + '.key'"
+            >
+              <el-input v-model="item.key" placeholder="Header Key" style="width:200px; margin-top:20px" />
+              <el-input v-model="item.value" placeholder="Header Value" style="width:500px; margin-left:20px" />
+              <el-button type="danger" icon="el-icon-delete" style="margin-left:20px" @click="deleteHeader(item, index)" />
+            </el-form-item>
+          </el-tab-pane>
+        </el-tabs>
+      </el-form-item>
+      <el-form-item v-show="hasArg==1">
+        <el-tabs>
+          <el-tab-pane label="参数设置">
+            <el-input v-model="form.arg" type="textarea" placeholder="批量参数添加，如：name=google&domain=www.google.com" :autosize="{ minRows: 4 }" />
+          </el-tab-pane>
+        </el-tabs>
+      </el-form-item>
+      <el-form-item v-show="hasCookie==1">
+        <el-tabs>
           <el-tab-pane label="Cookie设置">
-            <el-input v-model="cookie.value" type="textarea" :autosize="{ minRows: 4 }" />
+            <el-input v-model="form.cookie" type="textarea" :autosize="{ minRows: 4 }" />
           </el-tab-pane>
         </el-tabs>
       </el-form-item>
-      <el-form-item
-        v-for="(proxy,index) in form.proxys"
-        :key="proxy.key"
-        :prop="'proxys.' + index + '.proxy'"
-      >
-        <el-tabs @tab-click="handleClick">
+      <el-form-item v-show="hasProxy==1">
+        <el-tabs>
           <el-tab-pane label="代理设置">
-            <el-input v-model="proxy.ip" placeholder="请输入代理" style="width:200px" />
-            <el-input v-model="proxy.port" style="width:100px; margin-left:20px" />
-          </el-tab-pane>
-        </el-tabs>
-      </el-form-item>
-      <el-form-item>
-        <el-tabs v-model="headerTab" @tab-click="handleClick">
-          <el-tab-pane label="Header 请求头/返回头">
-            <el-input v-model="form.header" type="textarea" :autosize="{ minRows: 4 }" />
+            <el-input v-model="form.proxy.ip" placeholder="请输入代理" style="width:200px" />
+            <el-input v-model="form.proxy.port" style="width:100px; margin-left:20px" />
           </el-tab-pane>
         </el-tabs>
       </el-form-item>
@@ -75,14 +89,39 @@ export default {
         domain: '',
         method: 'GET',
         encode: 'UTF-8',
-        header: '',
-        args: [],
-        cookies: [],
-        proxys: []
+        header: {
+          key: 'Content-Type',
+          value: '',
+          optional: []
+        },
+        arg: '',
+        cookie: '',
+        proxy: {
+          ip: '',
+          port: ''
+        }
       }
     }
   },
   methods: {
+    addHeader() {
+      this.form.header.optional.push({
+        key: '',
+        value: ''
+      })
+    },
+    deleteHeader(item, index) {
+      this.form.header.optional.splice(index, 1)
+    },
+    dynamicArg() {
+      if (this.hasArg === true) {
+        this.form.args.push({
+          value: ''
+        })
+      } else {
+        this.form.args.splice(0, 1)
+      }
+    },
     dynamicCookie() {
       if (this.hasCookie === true) {
         this.form.cookies.push({
