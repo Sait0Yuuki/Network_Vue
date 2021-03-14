@@ -31,12 +31,21 @@ module.exports = {
   productionSourceMap: false,
   devServer: {
     port: port,
+    proxy: {
+      [process.env.VUE_APP_BASE_API]: {
+        target: `http://127.0.0.1:5000/api`,
+        changeOrigin: true, // 配置跨域
+        pathRewrite: {
+          ['^' + process.env.VUE_APP_BASE_API]: ''
+        }
+      }
+    },
     open: true,
     overlay: {
       warnings: false,
       errors: true
-    },
-    before: require('./mock/mock-server.js')
+    }
+    // before: require('./mock/mock-server.js')
   },
   configureWebpack: {
     // provide the app's title in webpack's name field, so that

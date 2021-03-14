@@ -56,36 +56,27 @@ export const constantRoutes = [
   },
 
   {
-    path: '/example',
+    path: '/http',
     component: Layout,
-    redirect: '/example/table',
-    name: 'Example',
-    meta: { title: 'HTTP', icon: 'el-icon-odometer' },
     children: [
       {
-        path: 'table',
-        name: 'Table',
-        component: () => import('@/views/table/index'),
-        meta: { title: 'Table', icon: 'table' }
-      },
-      {
-        path: 'tree',
-        name: 'Tree',
-        component: () => import('@/views/tree/index'),
-        meta: { title: 'Tree', icon: 'tree' }
+        path: 'index',
+        name: 'HTTP',
+        component: () => import('@/views/http/index'),
+        meta: { title: 'HTTP', icon: 'el-icon-odometer' }
       }
     ]
   },
 
   {
-    path: '/form',
+    path: '/dns',
     component: Layout,
     children: [
       {
         path: 'index',
-        name: 'Form',
-        component: () => import('@/views/form/index'),
-        meta: { title: 'Form', icon: 'form' }
+        name: 'DNS',
+        component: () => import('@/views/dns/index'),
+        meta: { title: 'DNS', icon: 'el-icon-files' }
       }
     ]
   },
@@ -98,7 +89,7 @@ export const constantRoutes = [
         path: 'index',
         name: 'SMTP',
         component: () => import('@/views/smtp/index'),
-        meta: { title: 'SMTP', icon: 'form' }
+        meta: { title: 'SMTP', icon: 'el-icon-message' }
       }
     ]
   },

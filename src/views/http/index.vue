@@ -68,14 +68,15 @@
         </el-tabs>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit">Create</el-button>
-        <el-button @click="onCancel">Cancel</el-button>
+        <el-button type="primary" @click="onSubmit">提交</el-button>
       </el-form-item>
     </el-form>
   </div>
 </template>
 
 <script>
+import { getList } from '@/api/http'
+
 export default {
   data() {
     return {
@@ -100,7 +101,8 @@ export default {
           ip: '',
           port: ''
         }
-      }
+      },
+      responseList: []
     }
   },
   methods: {
@@ -113,43 +115,10 @@ export default {
     deleteHeader(item, index) {
       this.form.header.optional.splice(index, 1)
     },
-    dynamicArg() {
-      if (this.hasArg === true) {
-        this.form.args.push({
-          value: ''
-        })
-      } else {
-        this.form.args.splice(0, 1)
-      }
-    },
-    dynamicCookie() {
-      if (this.hasCookie === true) {
-        this.form.cookies.push({
-          value: ''
-        })
-      } else {
-        this.form.cookies.splice(0, 1)
-      }
-    },
-    dynamicProxy() {
-      if (this.hasProxy === true) {
-        this.form.proxys.push({
-          ip: '',
-          port: '0'
-        })
-      } else {
-        this.form.proxys.splice(0, 1)
-      }
-    },
     onSubmit() {
       this.$message('submit!')
-      this.domain = '11341241'
-      console.log(this.form)
-    },
-    onCancel() {
-      this.$message({
-        message: 'cancel!',
-        type: 'warning'
+      getList(this.form).then(response => {
+        this.responseList = response.data.items
       })
     }
   }
