@@ -50,6 +50,9 @@
           <el-tab-pane label="参数设置">
             <el-input v-model="form.arg" type="textarea" placeholder="批量参数添加，如：name=google&domain=www.google.com" :autosize="{ minRows: 4 }" />
           </el-tab-pane>
+          <el-tab-pane label="JSON参数设置">
+            <el-input v-model="form.jsonarg" type="textarea" placeholder="JSON参数添加" :autosize="{ minRows: 4 }" />
+          </el-tab-pane>
         </el-tabs>
       </el-form-item>
       <el-form-item v-show="hasCookie==1">
@@ -68,18 +71,32 @@
         </el-tabs>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit">提交</el-button>
+        <el-button type="primary" :loading="isloading" @click="onSubmit">提交</el-button>
+      </el-form-item>
+      <el-form-item>
+        <v-chart class="chart" :option="option" />
       </el-form-item>
     </el-form>
   </div>
 </template>
 
 <script>
+import 'echarts'
+import VChart, { THEME_KEY } from 'vue-echarts'
+
 import { getList } from '@/api/http'
+import { compactObj, isEmpty } from '@/data'
 
 export default {
+  components: {
+    VChart
+  },
+  provide: {
+    [THEME_KEY]: 'vintage'
+  },
   data() {
     return {
+      isloading: false,
       hasCookie: false,
       hasProxy: false,
       hasHeader: false,
@@ -92,17 +109,75 @@ export default {
         encode: 'UTF-8',
         header: {
           key: 'Content-Type',
-          value: '',
+          value: 'text/html',
           optional: []
         },
         arg: '',
+        jsonarg: '',
         cookie: '',
         proxy: {
           ip: '',
           port: ''
         }
       },
-      responseList: []
+      tmp: [],
+      responseList: [],
+      option: {
+        title: {
+          text: '深圳月最低生活费组成（单位:元）'
+          // subtext: 'From ExcelHome',
+          // sublink: 'http://e.weibo.com/1341556070/AjQH99che'
+        },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: { // 坐标轴指示器，坐标轴触发有效
+            type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+          }
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true
+        },
+        xAxis: {
+          type: 'value'
+        },
+        yAxis: {
+          type: 'category',
+          splitLine: { show: false },
+          data: ['总费用', '房租', '水电费', '交通费', '伙食费', '日用品数']
+        },
+        series: [
+          {
+            name: 'requestStart',
+            type: 'bar',
+            stack: '总量',
+            itemStyle: {
+              barBorderColor: 'rgba(0,0,0,0)',
+              color: 'rgba(0,0,0,0)'
+            },
+            emphasis: {
+              itemStyle: {
+                barBorderColor: 'rgba(0,0,0,0)',
+                color: 'rgba(0,0,0,0)'
+              }
+            },
+            data: [0, 1700, 1400, 1200, 300, 0]
+          },
+          {
+            name: 'responseEnd',
+            type: 'bar',
+            stack: '总量',
+            itemStyle: {
+              barBorderRadius: 10,
+              barBorderColor: 'rgba(0,0,0,0)',
+              color: 'rgba(64,158,255,0.8)'
+            },
+            data: [2900, 1200, 300, 200, 900, 300]
+          }
+        ]
+      }
     }
   },
   methods: {
@@ -116,9 +191,14 @@ export default {
       this.form.header.optional.splice(index, 1)
     },
     onSubmit() {
+      this.isloading = true
+      this.tmp = JSON.parse(JSON.stringify(this.form)) // deep copy
+      // this.tmp = this.form
+      compactObj(this.tmp, isEmpty)
       this.$message('submit!')
-      getList(this.form).then(response => {
-        this.responseList = response.data.items
+      getList(this.tmp).then(response => {
+        console.log(response)
+        this.isloading = false
       })
     }
   }
@@ -131,5 +211,8 @@ export default {
 }
 .switch{
   margin-left: 30px;
+}
+.chart {
+  height: 400px;
 }
 </style>
