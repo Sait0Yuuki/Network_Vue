@@ -54,6 +54,11 @@ service.interceptors.response.use(
       return Promise.reject(new Error(res.message || 'Error'))
     } else {
       // console.log(res)
+      Message({
+        message: '成功',
+        type: 'success',
+        duration: 5 * 1000
+      })
       return res
     }
   },

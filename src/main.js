@@ -19,6 +19,8 @@ import ECharts from 'vue-echarts'
 import 'echarts/lib/chart/line'
 Vue.component('chart', ECharts)
 
+import './assets/icon/iconfont.css'
+
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api

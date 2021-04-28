@@ -17,12 +17,28 @@
           </el-select>
         </el-input>
       </el-form-item>
-      <el-form-item>
-        <el-switch v-model="hasHeader" inactive-text="Header" class="switch" />
-        <el-switch v-model="hasArg" inactive-text="参数设置" class="switch" />
-        <el-switch v-model="hasCookie" inactive-text="Cookie设置" class="switch" />
-        <el-switch v-model="hasProxy" inactive-text="代理设置" class="switch" />
-      </el-form-item>
+      <el-row style="margin-left:60px">
+        <el-col :span="3">
+          <el-form-item label="Header">
+            <el-switch v-model="hasHeader" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="3">
+          <el-form-item label="参数设置">
+            <el-switch v-model="hasArg" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="3">
+          <el-form-item label="Cookie">
+            <el-switch v-model="hasCookie" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="3">
+          <el-form-item label="代理设置">
+            <el-switch v-model="hasProxy" />
+          </el-form-item>
+        </el-col>
+      </el-row>
       <el-form-item v-show="hasHeader==1">
         <el-tabs v-model="headerTab">
           <el-tab-pane label="Header">
@@ -73,8 +89,8 @@
       <el-form-item>
         <el-button type="primary" :loading="isloading" @click="onSubmit">提交</el-button>
       </el-form-item>
-      <el-form-item>
-        <v-chart class="chart" :option="option" />
+      <el-form-item v-if="hasWaterfall==1" v-loading="isloading">
+        <v-chart ref="waterfall" :option="option" style="height:1000%" @click="openLink" />
       </el-form-item>
     </el-form>
   </div>
@@ -85,7 +101,7 @@ import 'echarts'
 import VChart, { THEME_KEY } from 'vue-echarts'
 
 import { getList } from '@/api/http'
-import { compactObj, isEmpty } from '@/data'
+import { compactObj, isEmpty, getBarColor } from '@/data'
 
 export default {
   components: {
@@ -97,6 +113,7 @@ export default {
   data() {
     return {
       isloading: false,
+      hasWaterfall: false,
       hasCookie: false,
       hasProxy: false,
       hasHeader: false,
@@ -123,10 +140,11 @@ export default {
       tmp: [],
       responseList: [],
       option: {
+        devicePixelRatio: 2,
         title: {
-          text: '深圳月最低生活费组成（单位:元）'
-          // subtext: 'From ExcelHome',
-          // sublink: 'http://e.weibo.com/1341556070/AjQH99che'
+          text: 'Resource Timing',
+          subtext: '',
+          sublink: ''
         },
         tooltip: {
           trigger: 'axis',
@@ -145,8 +163,20 @@ export default {
         },
         yAxis: {
           type: 'category',
-          splitLine: { show: false },
-          data: ['总费用', '房租', '水电费', '交通费', '伙食费', '日用品数']
+          axisLabel: { // 坐标轴刻度标签的相关设置。
+            formatter: function(value, index) {
+              // 超出8个字符后面就用省略号代替
+              if (value.length > 8) {
+                const v = '...' + value.slice(-8)
+                return v
+              } else {
+                return value
+              }
+            },
+            interval: 0
+          },
+          show: false,
+          data: []
         },
         series: [
           {
@@ -154,27 +184,27 @@ export default {
             type: 'bar',
             stack: '总量',
             itemStyle: {
-              barBorderColor: 'rgba(0,0,0,0)',
+              BorderColor: 'rgba(0,0,0,0)',
               color: 'rgba(0,0,0,0)'
             },
             emphasis: {
               itemStyle: {
-                barBorderColor: 'rgba(0,0,0,0)',
+                BorderColor: 'rgba(0,0,0,0)',
                 color: 'rgba(0,0,0,0)'
               }
             },
-            data: [0, 1700, 1400, 1200, 300, 0]
+            data: []
           },
           {
             name: 'responseEnd',
             type: 'bar',
             stack: '总量',
             itemStyle: {
-              barBorderRadius: 10,
-              barBorderColor: 'rgba(0,0,0,0)',
+              BorderRadius: 10,
+              BorderColor: 'rgba(0,0,0,0)',
               color: 'rgba(64,158,255,0.8)'
             },
-            data: [2900, 1200, 300, 200, 900, 300]
+            data: []
           }
         ]
       }
@@ -190,14 +220,41 @@ export default {
     deleteHeader(item, index) {
       this.form.header.optional.splice(index, 1)
     },
+    openLink(params) {
+      window.open(params.name)
+    },
     onSubmit() {
       this.isloading = true
+      this.hasWaterfall = true
+      this.option.title.subtext = this.form.protocol + this.form.domain
+      this.option.title.sublink = this.form.protocol + this.form.domain
       this.tmp = JSON.parse(JSON.stringify(this.form)) // deep copy
       // this.tmp = this.form
+      /*
+      name: "https://www.baidu.com/"
+      requestStart: 5273.520000000076
+      responseEnd: 5377.470000000017
+       */
       compactObj(this.tmp, isEmpty)
       this.$message('submit!')
       getList(this.tmp).then(response => {
         console.log(response)
+        this.option.yAxis.data = []
+        this.option.series[0].data = []
+        this.option.series[1].data = []
+        for (var i in response) {
+          this.option.yAxis.data.push(response[i].name)
+          this.option.series[0].data.push(response[i].requestStart)
+          var color = getBarColor(response[i].name)
+          var obj = {
+            value: response[i].responseEnd,
+            itemStyle: {
+              BorderRadius: 10,
+              color: color
+            }
+          }
+          this.option.series[1].data.push(obj)
+        }
         this.isloading = false
       })
     }

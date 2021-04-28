@@ -1,0 +1,44 @@
+{
+  "id": "2518890",
+  "name": "network",
+  "font_family": "iconfont",
+  "css_prefix_text": "el-icon-ali",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "141609",
+      "name": "dns",
+      "font_class": "dns",
+      "unicode": "e706",
+      "unicode_decimal": 59142
+    },
+    {
+      "icon_id": "397548",
+      "name": "video",
+      "font_class": "video",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
+      "icon_id": "5703785",
+      "name": "http",
+      "font_class": "http",
+      "unicode": "e609",
+      "unicode_decimal": 58889
+    },
+    {
+      "icon_id": "7210571",
+      "name": "ftp",
+      "font_class": "ftp",
+      "unicode": "e6d6",
+      "unicode_decimal": 59094
+    },
+    {
+      "icon_id": "18663315",
+      "name": "SMTP",
+      "font_class": "SMTP",
+      "unicode": "e82b",
+      "unicode_decimal": 59435
+    }
+  ]
+}

@@ -63,7 +63,7 @@ export const constantRoutes = [
         path: 'index',
         name: 'HTTP',
         component: () => import('@/views/http/index'),
-        meta: { title: 'HTTP', icon: 'el-icon-odometer' }
+        meta: { title: 'HTTP', icon: 'el-icon-alihttp' }
       }
     ]
   },
@@ -76,7 +76,7 @@ export const constantRoutes = [
         path: 'index',
         name: 'DNS',
         component: () => import('@/views/dns/index'),
-        meta: { title: 'DNS', icon: 'el-icon-files' }
+        meta: { title: 'DNS', icon: 'el-icon-alidns' }
       }
     ]
   },
@@ -89,7 +89,7 @@ export const constantRoutes = [
         path: 'index',
         name: 'SMTP',
         component: () => import('@/views/smtp/index'),
-        meta: { title: 'SMTP', icon: 'el-icon-message' }
+        meta: { title: 'SMTP', icon: 'el-icon-aliSMTP' }
       }
     ]
   },
