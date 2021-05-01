@@ -142,6 +142,7 @@ export default {
       option: {
         devicePixelRatio: 2,
         title: {
+          show: false,
           text: 'Resource Timing',
           subtext: '',
           sublink: ''
@@ -226,22 +227,24 @@ export default {
     onSubmit() {
       this.isloading = true
       this.hasWaterfall = true
-      this.option.title.subtext = this.form.protocol + this.form.domain
-      this.option.title.sublink = this.form.protocol + this.form.domain
       this.tmp = JSON.parse(JSON.stringify(this.form)) // deep copy
-      // this.tmp = this.form
       /*
       name: "https://www.baidu.com/"
       requestStart: 5273.520000000076
       responseEnd: 5377.470000000017
        */
+      this.option.title.show = false
+      this.option.yAxis.data = []
+      this.option.series[0].data = []
+      this.option.series[1].data = []
       compactObj(this.tmp, isEmpty)
-      this.$message('submit!')
+      this.$message('Submit..')
       getList(this.tmp).then(response => {
+        // console.log(typeof response)
+        this.option.title.show = true
+        this.option.title.subtext = this.form.protocol + this.form.domain
+        this.option.title.sublink = this.form.protocol + this.form.domain
         console.log(response)
-        this.option.yAxis.data = []
-        this.option.series[0].data = []
-        this.option.series[1].data = []
         for (var i in response) {
           this.option.yAxis.data.push(response[i].name)
           this.option.series[0].data.push(response[i].requestStart)
@@ -256,6 +259,10 @@ export default {
           this.option.series[1].data.push(obj)
         }
         this.isloading = false
+      }).catch(err => {
+        console.log(err)
+        this.isloading = false
+        this.hasWaterfall = false
       })
     }
   }

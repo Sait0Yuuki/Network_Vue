@@ -95,6 +95,19 @@ export const constantRoutes = [
   },
 
   {
+    path: '/ftp',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'FTP',
+        component: () => import('@/views/ftp/index'),
+        meta: { title: 'FTP', icon: 'el-icon-aliftp' }
+      }
+    ]
+  },
+
+  {
     path: '/nested',
     component: Layout,
     redirect: '/nested/menu1',
