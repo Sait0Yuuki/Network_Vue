@@ -2,18 +2,21 @@ import axios from 'axios'
 import { Message } from 'element-ui'
 // import { getToken } from '@/utils/auth'
 
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
+
 // create an axios instance
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
-  timeout: 10000 // request timeout
+  timeout: 100000 // request timeout
 })
 
 // request interceptor
 service.interceptors.request.use(
   config => {
+    NProgress.start()
     // do something before request is sent
-
     // if (store.getters.token) {
     //   // let each request carry token
     //   // ['X-Token'] is a custom headers key
@@ -59,6 +62,7 @@ service.interceptors.response.use(
         type: 'success',
         duration: 5 * 1000
       })
+      NProgress.done()
       return res
     }
   },

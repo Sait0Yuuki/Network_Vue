@@ -63,3 +63,29 @@ div:focus {
 .app-container {
   padding: 20px;
 }
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background: transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb { // 滑块部分
+  background: transparent;
+  border-radius: 4px;
+  }
+  
+  :hover::-webkit-scrollbar-thumb { // 轨道部分
+  background: hsla(0, 0%, 53%, 0.3);
+  }
+  
+  :hover::-webkit-scrollbar-track {
+  background: hsla(0, 0%, 53%, 0.1);
+  }
+  
+  // 表格右侧滚动条区域宽度
+  .custom-theme .el-table td.gutter {
+  width: 0
+  }
+  
+  

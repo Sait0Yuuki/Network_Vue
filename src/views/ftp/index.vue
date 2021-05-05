@@ -45,33 +45,58 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item v-show="form.method==1 || form.method==2" label="路径" prop="dir">
+          <el-form-item v-if="form.method==1 || form.method==2" label="路径" prop="dir">
             <el-input v-model="form.dir" placeholder="/home/usr" clearable :style="{width: '100%'}" />
           </el-form-item>
         </el-col>
         <el-col :span="24">
           <el-form-item size="large">
-            <el-button type="primary" @click="submitForm">提交</el-button>
+            <el-button v-loading="isLoading" type="primary" @click="submitForm">提交</el-button>
             <el-button @click="resetForm">重置</el-button>
           </el-form-item>
         </el-col>
+        <el-col>
+          <el-collapse-transition>
+            <div v-show="hasUpload">
+              <el-form-item>
+                <el-table :data="tableData">
+                  <el-table-column
+                    v-for="(item,index) in theadData"
+                    :key="index"
+                    :label="item"
+                    :prop="item"
+                    :show-overflow-tooltip="true"
+                  />
+                  <!-- 动态生成列结束 -->
+                </el-table>
+              </el-form-item>
+            </div>
+          </el-collapse-transition>
+        </el-col>
+        <el-col />
       </el-form>
     </el-row>
   </div>
 </template>
 <script>
+import { getList } from '@/api/ftp'
+
 export default {
   components: {},
   props: [],
   data() {
     return {
       form: {
-        host: undefined,
-        user: undefined,
-        password: undefined,
-        method: undefined,
+        host: '159.75.123.97',
+        user: 'uftp',
+        password: 'axziOblYTpz5Yh663KaA',
+        method: 0,
         dir: undefined
       },
+      isLoading: 0,
+      hasUpload: 0,
+      theadData: [],
+      tableData: [],
       rules: {
         host: [{
           required: true,
@@ -98,6 +123,7 @@ export default {
           trigger: 'change'
         }],
         dir: [{
+          required: true,
           pattern: /^\/(\w+\/?)+$/,
           message: '请输入正确路径',
           trigger: 'blur'
@@ -123,11 +149,35 @@ export default {
     submitForm() {
       this.$refs['form'].validate(valid => {
         if (!valid) return
+        this.$message('Submit..Wait about 60s')
         // TODO 提交表单
+        this.isLoading = 1
+        this.hasUpload = 0
+        this.tableData = []
+        this.theadData = []
+        getList(this.form).then(response => {
+          // this.theadList =
+          for (var key in response[0]) {
+            this.theadData.push(key)
+          }
+          console.log(this.theadList)
+          for (let i = 0; i <= 9; i++) {
+            this.tableData.push(response[i])
+          }
+          this.hasUpload = 1
+          this.isLoading = 0
+          console.log(this.tableData)
+        }).catch(err => {
+          console.log(err)
+        })
       })
     },
     resetForm() {
+      this.isLoading = 0
       this.$refs['form'].resetFields()
+      this.hasUpload = 0
+      this.tableData = []
+      this.theadData = []
     }
   }
 }
